@@ -3,11 +3,12 @@ import pluginJs from "@eslint/js";
 
 
 export default [
-  {
-    languageOptions: {
-      globals: globals.browser,
-    },
-    ignores: ["dist/"], // Игнорируем папку dist
-  },
+  {languageOptions: { globals: globals.browser }},
   pluginJs.configs.recommended,
+  {
+    files: ["dist/**/*.js"],
+    rules: {
+      "no-unused-vars": "off",
+    },
+  },
 ];

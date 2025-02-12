@@ -41,6 +41,7 @@
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "i18next": "^24.2.2",
     "on-change": "^5.0.1",
     "yup": "^1.6.1"
   }

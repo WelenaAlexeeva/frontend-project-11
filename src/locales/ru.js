@@ -12,7 +12,12 @@ export default {
                 unknown: 'Неизвестная ошибка. Что-то пошло не так.',
     
             }            
-
+        },
+        posts: {
+            title: 'Посты',
+        },
+        feeds: {
+            title: 'Фиды',
         }
     }
 }

@@ -6,13 +6,17 @@ import i18next from 'i18next';
 import ru from './locales/ru.js';
 import {
     formValidationError,
-    loading, loaded, loading_failed
+    loading, loaded, loading_failed,
+    renderContent
 } from './view.js';
+import toParse from './parser.js';
+
+
 
 
 export default () => {
-    const i18nInstance = i18next.createInstance();
-    i18nInstance.init({
+    const i18n = i18next.createInstance();
+    i18n.init({
         lng: 'ru',
         debug: false,
         resources: {
@@ -29,18 +33,23 @@ export default () => {
         loading: {
             status: 'idle',
             error: null,
+        },
+        data: {
+            feeds: [],
+            posts: [],
         }
     }
     
     const watchedState = onChange(state, (path) => {
         if (path === 'rssForm') {
-            if (!state.rssForm.valid) formValidationError(state.rssForm.error);
+            if (!state.rssForm.valid) formValidationError(i18n.t(state.rssForm.error));
         }
-        if (path === 'loading.status') {
-            if(state.loading.status ==='loading') loading(i18nInstance.t('feedback.loading'));
-            if(state.loading.status ==='loaded') loaded(i18nInstance.t('feedback.loaded'));
-            if(state.loading.status ==='failed') loading_failed(state.loading.error)
-            }
+        if (path === 'loading') {
+            if(state.loading.status ==='loading') loading(i18n.t('feedback.loading'));
+            if(state.loading.status ==='loaded') loaded(i18n.t('feedback.loaded'));
+            if(state.loading.status ==='failed') loading_failed(i18n.t(state.loading.error));
+        }
+        if (path === 'data') renderContent(state.data, i18n.t('feeds.title'), i18n.t('posts.title'))
     });
 
     const validate = (url, urls) => {
@@ -48,9 +57,9 @@ export default () => {
             url: yup
             .string()
             .trim()
-            .required(i18nInstance.t('feedback.errors.required'))
-            .url(i18nInstance.t('feedback.errors.urlIncorrect'))
-            .notOneOf(urls, i18nInstance.t('feedback.errors.urlAlreadyExist'))
+            .required('feedback.errors.required')
+            .url('feedback.errors.urlIncorrect')
+            .notOneOf(urls, 'feedback.errors.urlAlreadyExist')
             
         });
         return schema.validate({ url }, { abortEarly: false })
@@ -63,7 +72,7 @@ export default () => {
         return fetch(`${allOriginsUrl}${url}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error(i18nInstance.t('feedback.errors.network'));
+                throw new Error('feedback.errors.network');
             }
             return response.json();
         })
@@ -87,17 +96,21 @@ export default () => {
             } 
             else {
                 watchedState.rssForm = { valid: true, error: '' };
-    
-                watchedState.loading.status = 'loading';
+
+                watchedState.loading = { status: 'loading', error: '' }
                 load(url)
                 .then(data => {
-                    watchedState.loading.status = 'loaded';
+                    const parsedData = toParse(data);
+                    watchedState.loading = { status: 'loaded', error: '' }
                     watchedState.validRssLinks.push(url);
-                    console.log('data', data);
+                    watchedState.data = { 
+                        feeds: [...watchedState.data.feeds, parsedData.feed],
+                        posts: [...watchedState.data.posts, ...parsedData.items],
+                    };
+
                 })
                 .catch(e => {
-                    watchedState.loading.status = 'failed';
-                    watchedState.loading.error = e.message;
+                    watchedState.loading = { status: 'failed', error: e.message }
                 })
             }   
             })

@@ -7,7 +7,7 @@ import ru from './locales/ru.js';
 import {
     formValidationError,
     loading, loaded, loading_failed,
-    renderContent
+    renderContent, postIsRead
 } from './view.js';
 import toParse from './parser.js';
 
@@ -50,6 +50,10 @@ export default () => {
             if(state.loading.status ==='failed') loading_failed(i18n.t(state.loading.error));
         }
         if (path === 'data') renderContent(state.data, i18n.t('feeds.title'), i18n.t('posts.title'))
+        if (path.startsWith('data.posts')) {
+            const postIndex = path.split('.')[2];
+            postIsRead(state.data.posts[postIndex].id);
+        }
     });
 
     const validate = (url, urls) => {
@@ -81,8 +85,29 @@ export default () => {
         });
     }
 
+    const updatePosts = (state) => {
+        return Promise.all(state.validRssLinks.map(rssLink => {
+            load(rssLink)
+            .then(data => {
+                const parsedData = toParse(data);
+                const newPosts = parsedData.items.filter(item => state.data.posts.some(post => post.title === item));
+                if (newPosts.length > 0) {
+                    state.data = { 
+                        feeds: [...watchedState.data.feeds],
+                        posts: [...watchedState.data.posts, ...newPosts],
+                    };
+                }
+            })
+            .catch(() => {});
+        }))
+        .then(() => {
+            setTimeout(() => updatePosts(state), 5000);
+        });
+
+    }
+
     const form = document.querySelector('.rss-form');
-    
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -114,6 +139,21 @@ export default () => {
                 })
             }   
             })
+    })
+    updatePosts(watchedState);
+
+    const posts = document.querySelector('.posts');
+    posts.addEventListener('click', (e) => {
+        const postId = e.target.dataset.id;
+        const targetPost = watchedState.data.posts.find(post => post.id === postId);
+        targetPost.isRead = true;
+        if (e.target.matches('button')) {
+            const modalTitle = document.querySelector('.modal-title');
+            modalTitle.textContent = targetPost.title;
+            const modalBody =  document.querySelector('.modal-body');
+            modalBody.textContent = targetPost.description;
+        }
+
     })
 }
 

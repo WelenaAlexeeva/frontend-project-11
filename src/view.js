@@ -59,9 +59,10 @@ export const renderContent = (rss, postsTitle, feedsTitle) => {
         li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
         const a = document.createElement('a');
-        a.classList.add('fw-bold');
+        if (post.isRead) a.classList.add('fw-normal');
+        else a.classList.add('fw-bold');
         a.href = post.link;
-        a.setAttribute('data-id', '2');
+        a.setAttribute('data-id', post.id);
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.textContent = post.title;
@@ -70,7 +71,7 @@ export const renderContent = (rss, postsTitle, feedsTitle) => {
         const button = document.createElement('button');
         button.type = 'button';
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-        button.setAttribute('data-id', '2');
+        button.setAttribute('data-id', post.id);
         button.setAttribute('data-bs-toggle', 'modal');
         button.setAttribute('data-bs-target', '#modal');
         button.textContent = 'Просмотр';
@@ -78,7 +79,6 @@ export const renderContent = (rss, postsTitle, feedsTitle) => {
 
         ulPosts.append(li);
     });
-    
     
     feeds.textContent ='';
     const feedsCard = createCard(feedsTitle);
@@ -98,8 +98,6 @@ export const renderContent = (rss, postsTitle, feedsTitle) => {
         li.append(p);
         ulFeeds.append(li);        
     });
-    
-
 }
 
 export const loading_failed = (error) => {
@@ -109,4 +107,10 @@ export const loading_failed = (error) => {
     submitBtn.disabled = false;
     input.disabled = false;
     input.focus();
+}
+
+export const postIsRead = (postId) => {
+    const a = document.querySelector(`[data-id="${postId}"]`);
+    a.classList.remove('fw-bold');
+    a.classList.add('fw-normal');
 }

@@ -18,7 +18,8 @@ const toParse = (data) => {
         const title = item.querySelector('title').textContent;
         const link = item.querySelector('link').textContent;
         const description = item.querySelector('description').textContent;
-        rss.items.push({ id, title, link, description, feedId })
+        const isRead = false;
+        rss.items.push({ id, title, link, description, feedId, isRead })
     });
     return rss;
 };

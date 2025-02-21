@@ -4,9 +4,9 @@ export default {
             loading: 'Ссылка загружается...',
             loaded: 'RSS успешно загружен',
             errors: {
-                required: 'Поле обязательно для заполнения',
-                urlIncorrect: 'Введите корректный URL',
-                urlAlreadyExist: 'URL уже есть в списке',
+                required: 'Не должно быть пустым',
+                urlIncorrect: 'Ссылка должна быть валидным URL',
+                urlAlreadyExist: 'RSS уже существует',
                 network: 'Ошибка сети',
                 parser: 'Ресурс не содержит валидный RSS',
                 unknown: 'Неизвестная ошибка. Что-то пошло не так.',
@@ -15,6 +15,7 @@ export default {
         },
         posts: {
             title: 'Посты',
+            button: 'Просмотр',
         },
         feeds: {
             title: 'Фиды',

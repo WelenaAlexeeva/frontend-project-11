@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
 import './styles.css';
 import * as yup from 'yup';
 import onChange from 'on-change';
@@ -7,7 +8,7 @@ import ru from './locales/ru.js';
 import {
     formValidationError,
     loading, loaded, loading_failed,
-    renderContent, postIsRead
+    renderContent, postIsRead, modal
 } from './view.js';
 import toParse from './parser.js';
 
@@ -34,6 +35,7 @@ export default () => {
             status: 'idle',
             error: null,
         },
+        modal: '',
         data: {
             feeds: [],
             posts: [],
@@ -49,11 +51,15 @@ export default () => {
             if(state.loading.status ==='loaded') loaded(i18n.t('feedback.loaded'));
             if(state.loading.status ==='failed') loading_failed(i18n.t(state.loading.error));
         }
-        if (path === 'data') renderContent(state.data, i18n.t('feeds.title'), i18n.t('posts.title'))
+        if (path === 'data') renderContent(state.data, 
+            i18n.t('posts.title'), 
+            i18n.t('posts.button'), 
+            i18n.t('feeds.title'));
         if (path.startsWith('data.posts')) {
             const postIndex = path.split('.')[2];
             postIsRead(state.data.posts[postIndex].id);
         }
+        if (path === 'modal') modal(state.modal);
     });
 
     const validate = (url, urls) => {
@@ -148,12 +154,8 @@ export default () => {
         const targetPost = watchedState.data.posts.find(post => post.id === postId);
         targetPost.isRead = true;
         if (e.target.matches('button')) {
-            const modalTitle = document.querySelector('.modal-title');
-            modalTitle.textContent = targetPost.title;
-            const modalBody =  document.querySelector('.modal-body');
-            modalBody.textContent = targetPost.description;
+            watchedState.modal = targetPost;
         }
-
     })
 }
 

@@ -27,7 +27,7 @@ export const loaded = (msg) => {
     input.focus();
 }
 
-export const renderContent = (rss, postsTitle, feedsTitle) => {
+export const renderContent = (rss, postsTitle, postsButton, feedsTitle) => {
     const posts = document.querySelector('div.posts');
     const feeds = document.querySelector('div.feeds');
 
@@ -74,7 +74,7 @@ export const renderContent = (rss, postsTitle, feedsTitle) => {
         button.setAttribute('data-id', post.id);
         button.setAttribute('data-bs-toggle', 'modal');
         button.setAttribute('data-bs-target', '#modal');
-        button.textContent = 'Просмотр';
+        button.textContent = postsButton;
         li.append(button);
 
         ulPosts.append(li);
@@ -113,4 +113,13 @@ export const postIsRead = (postId) => {
     const a = document.querySelector(`[data-id="${postId}"]`);
     a.classList.remove('fw-bold');
     a.classList.add('fw-normal');
+}
+
+export const modal = (modal) => {
+    const modalTitle = document.querySelector('.modal-title');
+    modalTitle.textContent = modal.title;
+    const modalBody =  document.querySelector('.modal-body');
+    modalBody.textContent = modal.description;
+    const modalButton = document.querySelector('.modal-footer>button');
+    modalButton.href = modal.link;
 }

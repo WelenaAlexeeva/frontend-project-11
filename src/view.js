@@ -120,6 +120,6 @@ export const modal = (modal) => {
     modalTitle.textContent = modal.title;
     const modalBody =  document.querySelector('.modal-body');
     modalBody.textContent = modal.description;
-    const modalButton = document.querySelector('.modal-footer>button');
-    modalButton.href = modal.link;
+    const a = document.querySelector('.modal-footer>a');
+    a.href = modal.link;
 }

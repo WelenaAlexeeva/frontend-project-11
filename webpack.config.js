@@ -20,7 +20,7 @@ export default {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    hot: true, 
+    hot: true,
   },
   plugins: [
     new HTMLWebpackPlugin({
@@ -32,7 +32,7 @@ export default {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
-      }
-    ]
-  }
-}
+      },
+    ],
+  },
+};

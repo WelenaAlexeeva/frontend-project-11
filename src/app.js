@@ -79,7 +79,9 @@ export default () => {
     
     const load = (url) => {
         const allOriginsUrl = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
-        return fetch(`${allOriginsUrl}${url}`)
+        return fetch(`${allOriginsUrl}${url}`, 
+            { signal: AbortSignal.timeout(5000), }
+        )
         .then(response => {
             if (!response.ok) {
                 throw new Error('feedback.errors.network');
@@ -87,7 +89,8 @@ export default () => {
             return response.json();
         })
         .catch(e => {
-            throw e;
+            console.log(e);
+            throw new Error('feedback.errors.network');
         });
     }
 
@@ -145,8 +148,9 @@ export default () => {
                 })
             }   
             })
-    })
-    updatePosts(watchedState);
+    });
+
+    if (watchedState.validRssLinks.length > 0) updatePosts(watchedState);
 
     const posts = document.querySelector('.posts');
     posts.addEventListener('click', (e) => {

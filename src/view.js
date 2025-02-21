@@ -56,7 +56,14 @@ export const renderContent = (rss, postsTitle, postsButton, feedsTitle) => {
   const ulPosts = postsCard.querySelector('ul');
   rss.posts.forEach((post) => {
     const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    li.classList.add(
+      'list-group-item',
+      'd-flex',
+      'justify-content-between',
+      'align-items-start',
+      'border-0',
+      'border-end-0',
+    );
 
     const a = document.createElement('a');
     if (post.isRead) a.classList.add('fw-normal');
@@ -115,11 +122,11 @@ export const postIsRead = (postId) => {
   a.classList.add('fw-normal');
 };
 
-export const modal = (modal) => {
+export const modal = (stateModal) => {
   const modalTitle = document.querySelector('.modal-title');
-  modalTitle.textContent = modal.title;
+  modalTitle.textContent = stateModal.title;
   const modalBody = document.querySelector('.modal-body');
-  modalBody.textContent = modal.description;
+  modalBody.textContent = stateModal.description;
   const a = document.querySelector('.modal-footer>a');
-  a.href = modal.link;
+  a.href = stateModal.link;
 };

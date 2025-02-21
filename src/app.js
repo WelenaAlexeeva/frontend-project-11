@@ -104,13 +104,13 @@ export default () => {
       });
   };
 
-  const updatePosts = (state) => {
-    Promise.all(state.validRssLinks.map((rssLink) => load(rssLink)
+  const updatePosts = () => {
+    Promise.all(watchedState.validRssLinks.map((rssLink) => load(rssLink)
       .then((data) => {
         const parsedData = toParse(data);
-        const newPosts = parsedData.items.filter((item) => state.data.posts.some((post) => post.title === item));
+        const newPosts = parsedData.items.filter((item) => watchedState.data.posts.some((post) => post.title === item));
         if (newPosts.length > 0) {
-          state.data = {
+          watchedState.data = {
             feeds: [...watchedState.data.feeds],
             posts: [...watchedState.data.posts, ...newPosts],
           };
@@ -145,17 +145,16 @@ export default () => {
               feeds: [...watchedState.data.feeds, parsedData.feed],
               posts: [...watchedState.data.posts, ...parsedData.items],
             };
+            updatePosts();
           })
-          .catch((e) => {
-            watchedState.loading = { status: 'failed', error: e.message };
+          .catch((err) => {
+            watchedState.loading = { status: 'failed', error: err.message };
           });
       })
-      .catch((e) => {
-        watchedState.rssForm = { valid: false, error: e.message };
+      .catch((err) => {
+        watchedState.rssForm = { valid: false, error: err.message };
       });
   });
-
-  if (watchedState.validRssLinks.length > 0) updatePosts(watchedState);
 
   const posts = document.querySelector('.posts');
   posts.addEventListener('click', (e) => {

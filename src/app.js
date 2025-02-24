@@ -39,7 +39,7 @@ export default () => {
         },
       };
 
-      const watchedState = onChange(state, (path) => {
+      const wState = onChange(state, (path) => {
         if (path === 'rssForm') {
           if (!state.rssForm.valid) formValidationError(i18n.t(state.rssForm.error));
         }
@@ -73,11 +73,7 @@ export default () => {
             .notOneOf(urls, 'feedback.errors.urlAlreadyExist'),
 
         });
-        return schema.validate({ url }, { abortEarly: false })
-          .then(() => null)
-          .catch((e) => {
-            throw e;
-          });
+        return schema.validate({ url }, { abortEarly: false });
       };
 
       const load = (url) => {
@@ -89,7 +85,7 @@ export default () => {
         )
           .then((response) => {
             if (!response.ok) {
-              throw new Error('feedback.errors.network');
+              throw new Error('feedback.errors.notOk');
             }
             return response.json();
           })
@@ -99,14 +95,15 @@ export default () => {
       };
 
       const updatePosts = () => {
-        Promise.all(watchedState.validRssLinks.map((rssLink) => load(rssLink)
+        Promise.all(wState.validRssLinks.map((rssLink) => load(rssLink)
           .then((data) => {
             const parsedData = toParse(data);
-            const newPosts = parsedData.items.filter(({ title }) => watchedState.data.posts.some((p) => p.title === title));
-            if (newPosts.length > 0) {
-              watchedState.data = {
-                feeds: [...watchedState.data.feeds],
-                posts: [...watchedState.data.posts, ...newPosts],
+            const { items } = parsedData;
+            const n = items.filter(({ title }) => wState.data.posts.some((p) => p.title === title));
+            if (n.length > 0) {
+              wState.data = {
+                feeds: [...wState.data.feeds],
+                posts: [...wState.data.posts, ...n],
               };
             }
           })
@@ -123,44 +120,49 @@ export default () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const url = formData.get('url');
-        const urls = watchedState.validRssLinks;
+        const urls = wState.validRssLinks;
 
         validate(url, urls)
           .then(() => {
-            watchedState.rssForm = { valid: true, error: '' };
+            wState.rssForm = { valid: true, error: '' };
 
-            watchedState.loading = { status: 'loading', error: '' };
+            wState.loading = { status: 'loading', error: '' };
             load(url)
               .then((data) => {
                 const parsedData = toParse(data);
-                watchedState.loading = { status: 'loaded', error: '' };
-                watchedState.validRssLinks.push(url);
-                watchedState.data = {
-                  feeds: [...watchedState.data.feeds, parsedData.feed],
-                  posts: [...watchedState.data.posts, ...parsedData.items],
+                wState.loading = { status: 'loaded', error: '' };
+                wState.validRssLinks.push(url);
+
+                wState.data = {
+                  feeds: [...wState.data.feeds, parsedData.feed],
+                  posts: [...wState.data.posts, ...parsedData.items],
                 };
-                updatePosts();
+
+
               })
               .catch((err) => {
-                watchedState.loading = { status: 'failed', error: err.message };
+                wState.loading = { status: 'failed', error: err.message };
               });
           })
           .catch((err) => {
-            watchedState.rssForm = { valid: false, error: err.message };
+            wState.rssForm = { valid: false, error: err.message };
           });
       });
+
+    //   updatePosts();
 
       const posts = document.querySelector('.posts');
       posts.addEventListener('click', (e) => {
         const postId = e.target.dataset.id;
-        const targetPost = watchedState.data.posts.find((post) => post.id === postId);
+        const targetPost = wState.data.posts.find((post) => post.id === postId);
         targetPost.isRead = true;
         if (e.target.matches('button')) {
-          watchedState.modal = targetPost;
+          wState.modal = targetPost;
         }
       });
     })
     .catch((e) => {
+      // eslint-disable-next-line no-console
       console.error('Ошибка при инициализации i18n:', e);
     });
 };

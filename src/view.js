@@ -72,7 +72,7 @@ export const renderContent = (rss, postsTitle, postsButton, feedsTitle) => {
     a.setAttribute('data-id', post.id);
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
-    a.textContent = post.title;
+    a.innerHTML = post.title;
     li.append(a);
 
     const button = document.createElement('button');

@@ -137,8 +137,6 @@ export default () => {
                   feeds: [...wState.data.feeds, parsedData.feed],
                   posts: [...wState.data.posts, ...parsedData.items],
                 };
-
-
               })
               .catch((err) => {
                 wState.loading = { status: 'failed', error: err.message };
@@ -149,7 +147,7 @@ export default () => {
           });
       });
 
-    //   updatePosts();
+      updatePosts();
 
       const posts = document.querySelector('.posts');
       posts.addEventListener('click', (e) => {
